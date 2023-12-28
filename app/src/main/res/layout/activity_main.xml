@@ -22,6 +22,14 @@
             android:ems="10"
             android:hint="Add new item"
             android:inputType="textPersonName" />
+        <EditText
+            android:id="@+id/editPhone_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:ems="10"
+            android:hint="Add new item"
+            android:inputType="textPersonName" />
 
         <Button
             android:id="@+id/button"
