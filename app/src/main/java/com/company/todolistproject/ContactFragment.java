@@ -1,4 +1,4 @@
-package com.example.tab_layout;
+package com.company.todolistproject;
 
 import android.os.Bundle;
 

@@ -25,6 +25,8 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
 
+    implementation 'androidx.fragment:fragment:1.2.5'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
