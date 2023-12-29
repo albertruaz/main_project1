@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,67 +15,59 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.widget.SimpleAdapter;
+
+import java.util.Map;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText item;
     Button add;
     ListView listView;
+    ListView listContact;
     ArrayList<String> itemlist = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
 
-    public ContactList extract() {
+    public List<Map<String, String>> extract() {
         try {
-
-            InputStream inputStream = getAssets().open("address.json");
+            //jsonString 추출
+            InputStream inputStream = getAssets().open("contact_data.json");
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
             StringBuilder StringBuilder = new StringBuilder();
             for (int data = reader.read(); data != -1; data = reader.read()) {
                 StringBuilder.append((char)data);
             }
             String jsonString = StringBuilder.toString();
 
-            System.out.println("jsonString: " + jsonString);
+            //jsonString 파싱
+            List<Map<String, String>> contactList = new ArrayList<Map<String, String>>();
+
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(jsonString); // 이걸 경로로 변경
-
-            // 주소록 데이터를 저장할 ContactList 생성
-            ContactList contactList = new ContactList();
-
-            // "address" 배열에 대한 반복
-            for (JsonNode addressNode : rootNode.path("address")) {
+            JsonNode rootNode = objectMapper.readTree(jsonString);
+            for (JsonNode addressNode : rootNode.path("contact")) {
                 String name = addressNode.path("name").asText();
                 String phoneNum = addressNode.path("phone_num").asText();
 
-                // Contact 객체 생성 및 ContactList에 추가
-                Contact contact = new Contact(name, phoneNum);
-                contactList.addContact(contact);
-
-                System.out.println("Name: " + name);
-                System.out.println("Phone Number: " + phoneNum);
-                System.out.println("--------------");
+                Map<String, String> contact = new HashMap<String, String>(2);
+                contact.put("name", name);
+                contact.put("phoneNum", phoneNum);
+                contactList.add(contact);
             }
-            // ContactList에서 데이터 가져와서 활용 가능
-            List<Contact> savedContacts = contactList.getContacts();
-            for (Contact savedContact : savedContacts) {
-                // 저장된 데이터 활용 예시
-                System.out.println("Saved Contact - Name: " + savedContact.getName() + ", Phone Number: " + savedContact.getPhoneNum());
-            }
+            System.out.println(contactList.size());
             return contactList;
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            ContactList contactList = new ContactList();
-            return contactList;
         }
-
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+        return data;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         item = findViewById(R.id.editText);
         add = findViewById(R.id.button);
         listView = findViewById(R.id.list);
+        listContact = findViewById(R.id.listContact);
 
         itemlist = FileHelper.readData(this);
 
@@ -101,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 arrayAdapter.notifyDataSetChanged();
             }
         });
-        ContactList cl = extract();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -128,5 +119,16 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.show();
             }
         });
+
+        // contactlist 출력
+        List<Map<String, String>> contactList = extract();
+
+        // contact adapter 설정
+        SimpleAdapter adapter = new SimpleAdapter(this, contactList,
+                android.R.layout.simple_list_item_2,
+                new String[] {"name", "phoneNum"},
+                new int[] {android.R.id.text1, android.R.id.text2});
+        listContact.setAdapter(adapter);
+
     }
 }
